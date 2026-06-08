@@ -404,8 +404,8 @@ npm run example:copilot # Live Copilot API demo (requires gh auth login)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `COPILOT_MODEL` | `claude-haiku-4.5` | Model for task execution |
-| `COPILOT_CONSULT_MODEL` | `claude-haiku-4.5` | Model for verification/planning |
+| `COPILOT_MODEL` | `claude-sonnet-4.5` | Model for task execution |
+| `COPILOT_CONSULT_MODEL` | `claude-haiku-4.5` | Model for verification/planning (cheap) |
 | `COPILOT_GITHUB_TOKEN` | `gh auth token` | GitHub token for Copilot API |
 | `LOCAL_URL` | `http://127.0.0.1:11434/v1` | Ollama API URL (proxy mode) |
 | `CLOUD_URL` | `https://api.openai.com/v1` | Cloud API URL (proxy mode) |
