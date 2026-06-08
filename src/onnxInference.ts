@@ -37,8 +37,22 @@ interface OnnxRuntimeModule {
     Tensor: new (type: "float32", data: Float32Array, dims: number[]) => OnnxTensor;
 }
 
+/** Maximum number of ONNX sessions to cache. */
+const SESSION_CACHE_MAX_SIZE = 10;
+
 /** Cache ONNX inference sessions to avoid expensive re-creation on every call. */
 const sessionCache = new Map<string, OnnxInferenceSession>();
+
+/** Evict the oldest session if cache is full. */
+function cacheSession(key: string, session: OnnxInferenceSession): void {
+    if (sessionCache.size >= SESSION_CACHE_MAX_SIZE && !sessionCache.has(key)) {
+        const oldest = sessionCache.keys().next().value;
+        if (oldest !== undefined) {
+            sessionCache.delete(oldest);
+        }
+    }
+    sessionCache.set(key, session);
+}
 
 /** Descriptor for a bundled ONNX model loaded from a JSON manifest. */
 export interface ModelBundle {
@@ -167,7 +181,7 @@ export async function predictProbability(
         if (!session) {
             getLogger().debug(`[OnnxInference] creating inference session: model=${bundle.modelPath} features=${bundle.featureOrder.length}`);
             session = await ort.InferenceSession.create(bundle.modelPath);
-            sessionCache.set(bundle.modelPath, session);
+            cacheSession(bundle.modelPath, session);
         }
         if (!session) {
             getLogger().warning(`[OnnxInference] failed to create inference session: model=${bundle.modelPath}`);

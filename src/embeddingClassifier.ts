@@ -77,6 +77,9 @@ let embeddingSession: unknown | null | undefined;
 let classifierSession: unknown | null | undefined;
 let tokenizerData: unknown | null | undefined;
 
+/** Loading promise to coalesce concurrent init calls */
+let initPromise: Promise<void> | null = null;
+
 // ── LRU cache for prompt embeddings ─────────────────────────────────────────
 
 /**
@@ -112,6 +115,10 @@ class LruCache<K, V> {
         this.map.set(key, value);
     }
 
+    clear(): void {
+        this.map.clear();
+    }
+
     get size(): number {
         return this.map.size;
     }
@@ -122,7 +129,7 @@ const embeddingCache = new LruCache<string, Float32Array>(EMBEDDING_CACHE_MAX_SI
 
 /** Reset the embedding cache (exposed for testing). */
 export function clearEmbeddingCache(): void {
-    embeddingCache["map"].clear();
+    embeddingCache.clear();
 }
 
 /**
@@ -157,6 +164,19 @@ export interface EmbeddingClassifyResult {
  * @param modelsDir - Path to the routing models directory
  */
 export async function initEmbeddingClassifier(modelsDir: string): Promise<void> {
+    // Coalesce concurrent init calls — only one load at a time
+    if (initPromise) {
+        return initPromise;
+    }
+    initPromise = doInitEmbeddingClassifier(modelsDir);
+    try {
+        await initPromise;
+    } finally {
+        initPromise = null;
+    }
+}
+
+async function doInitEmbeddingClassifier(modelsDir: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let ort: any;
     try {
@@ -204,14 +224,14 @@ export async function initEmbeddingClassifier(modelsDir: string): Promise<void> 
 /**
  * Classify a prompt using the mixed embedding + text features model.
  *
- * @param textFeatures - The 34 greenfield features already extracted
+ * @param textFeatures - The 34 greenfield features (optional — pass {} for embeddings-only classification)
  * @param prompt - The raw prompt text (for embedding computation)
  * @param modelsDir - Path to the routing models directory
  * @param featureOrder - Ordered feature names for the classifier input
  * @returns Classification result with probabilities per class
  */
 export async function classifyWithEmbeddings(
-    textFeatures: Record<string, number>,
+    textFeatures: Record<string, number> = {},
     prompt: string,
     modelsDir: string,
     featureOrder?: string[],
@@ -234,25 +254,12 @@ export async function classifyWithEmbeddings(
             };
         }
 
-        // Load embedding model
-        if (embeddingSession === undefined) {
-            const embedPath = join(modelsDir, routingConfig.embeddings.model);
-            try {
-                await access(embedPath);
-            } catch {
-                embeddingSession = null;
-                getLogger().debug(`[EmbeddingClassifier] embedding model not found: path=${embedPath}`);
-                return {
-                    success: false,
-                    predictedClass: 0,
-                    probabilities: [],
-                    error: `Embedding model not found: ${embedPath}`,
-                    errorCode: RoutingErrorCode.EMBEDDING_MODEL_NOT_FOUND,
-                };
-            }
-            getLogger().debug(`[EmbeddingClassifier] loading embedding model: path=${embedPath}`);
-            embeddingSession = await ort.InferenceSession.create(embedPath);
+        // Ensure models are loaded (coalesces with init if running concurrently)
+        if (embeddingSession === undefined || tokenizerData === undefined || classifierSession === undefined) {
+            await initEmbeddingClassifier(modelsDir);
         }
+
+        // Check embedding model loaded
         if (!embeddingSession) {
             getLogger().debug(`[EmbeddingClassifier] embedding session not loaded`);
             return {
@@ -264,46 +271,19 @@ export async function classifyWithEmbeddings(
             };
         }
 
-        // Load tokenizer
-        if (tokenizerData === undefined) {
-            const tokPath = join(modelsDir, routingConfig.embeddings.tokenizer);
-            try {
-                tokenizerData = JSON.parse(await readFile(tokPath, "utf-8"));
-                getLogger().debug(`[EmbeddingClassifier] loaded tokenizer: path=${tokPath}`);
-            } catch {
-                tokenizerData = null;
-                getLogger().debug(`[EmbeddingClassifier] tokenizer not found: path=${tokPath}`);
-                return {
-                    success: false,
-                    predictedClass: 0,
-                    probabilities: [],
-                    error: "Tokenizer not found",
-                    errorCode: RoutingErrorCode.TOKENIZER_NOT_FOUND,
-                };
-            }
+        // Check tokenizer loaded
+        if (!tokenizerData) {
+            return {
+                success: false,
+                predictedClass: 0,
+                probabilities: [],
+                error: "Tokenizer not loaded",
+                errorCode: RoutingErrorCode.TOKENIZER_NOT_FOUND,
+            };
         }
 
-        // Load classifier model
-        if (classifierSession === undefined) {
-            const classifierPath = join(modelsDir, routingConfig.embeddings.classifier);
-            try {
-                await access(classifierPath);
-            } catch {
-                classifierSession = null;
-                getLogger().debug(`[EmbeddingClassifier] classifier model not found: path=${classifierPath}`);
-                return {
-                    success: false,
-                    predictedClass: 0,
-                    probabilities: [],
-                    error: "Embedding classifier not found",
-                    errorCode: RoutingErrorCode.CLASSIFIER_NOT_FOUND,
-                };
-            }
-            getLogger().debug(`[EmbeddingClassifier] loading classifier model: path=${classifierPath}`);
-            classifierSession = await ort.InferenceSession.create(classifierPath);
-        }
+        // Check classifier loaded
         if (!classifierSession) {
-            getLogger().debug(`[EmbeddingClassifier] classifier session not loaded`);
             return {
                 success: false,
                 predictedClass: 0,
