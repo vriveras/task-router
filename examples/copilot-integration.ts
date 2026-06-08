@@ -27,8 +27,8 @@ import {
 // ── Copilot API client ──────────────────────────────────────────────────────
 
 const COPILOT_API_URL = "https://api.githubcopilot.com";
-const COPILOT_MODEL = process.env.COPILOT_MODEL ?? "claude-sonnet-4.5";
-const COPILOT_CONSULT_MODEL = process.env.COPILOT_CONSULT_MODEL ?? "gpt-4o-mini";
+const COPILOT_MODEL = process.env.COPILOT_MODEL ?? "claude-haiku-4.5";
+const COPILOT_CONSULT_MODEL = process.env.COPILOT_CONSULT_MODEL ?? "claude-haiku-4.5";
 
 function getGitHubToken(): string {
     const envToken = process.env.COPILOT_GITHUB_TOKEN ?? process.env.GH_TOKEN ?? process.env.GITHUB_TOKEN;
