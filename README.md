@@ -23,7 +23,7 @@ User prompt → "Refactor auth module to use OAuth 2.0 with PKCE..."
    → Re-execute on cloud (quality preserved)
 ```
 
-This is the **delegation pattern** from [MSR Frontiers research](https://github.com/vriveras/router-testing/blob/main/docs/delegation-economics-results.md): the local model executes while the cloud model remains available for verification. Unlike one-shot routing, delegation preserves frontier access and avoids quality cliffs.
+This is the **delegation pattern** from MSR Frontiers research: the local model executes while the cloud model remains available for verification. Unlike one-shot routing, delegation preserves frontier access and avoids quality cliffs.
 
 ## Quick Start
 
@@ -160,7 +160,7 @@ const complete: CloudCompletionFn = async (prompt) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: "gpt-4o-mini",
+            model: "claude-haiku-4.5",
             messages: [{ role: "user", content: prompt }],
         }),
     });
@@ -240,7 +240,7 @@ curl -X POST http://localhost:3456/classify \
 Routes requests transparently between local Ollama and cloud API:
 
 ```bash
-LOCAL_MODEL=qwen3:30b CLOUD_MODEL=gpt-4o npm run example:openai
+LOCAL_MODEL=qwen3:30b CLOUD_MODEL=claude-sonnet-4.5 npm run example:openai
 
 # Point any OpenAI-compatible client at the proxy
 curl http://localhost:4000/v1/chat/completions \
@@ -382,7 +382,7 @@ From two full 70-task SWE benchmarks comparing local vs cloud:
 
 Key finding: **pure routing is net-negative** — one-shot decisions without recovery create quality cliffs. The delegation pattern (this library) enables recovery via cloud verification, bringing economics toward the MSR target of 77% savings.
 
-See the full analysis: [Delegation Economics Results](https://github.com/vriveras/router-testing/blob/main/docs/delegation-economics-results.md)
+See the full analysis in the [Delegation Economics Results](docs/delegation-economics.md) document.
 
 ## Testing
 
@@ -411,7 +411,7 @@ npm run example:copilot # Live Copilot API demo (requires gh auth login)
 | `CLOUD_URL` | `https://api.openai.com/v1` | Cloud API URL (proxy mode) |
 | `CLOUD_API_KEY` | — | Cloud API key (proxy mode) |
 | `LOCAL_MODEL` | `qwen3:30b` | Local model name (proxy mode) |
-| `CLOUD_MODEL` | `gpt-4o` | Cloud model name (proxy mode) |
+| `CLOUD_MODEL` | `claude-sonnet-4.5` | Cloud model name (proxy mode) |
 
 ## Project Structure
 
