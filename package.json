@@ -18,7 +18,8 @@
     "dev": "tsc --watch",
     "example:basic": "tsx examples/basic-routing.ts",
     "example:server": "tsx examples/express-server.ts",
-    "example:openai": "tsx examples/openai-compatible.ts"
+    "example:openai": "tsx examples/openai-compatible.ts",
+    "example:copilot": "tsx examples/copilot-integration.ts"
   },
   "keywords": [
     "routing",

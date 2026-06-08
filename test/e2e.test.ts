@@ -10,6 +10,7 @@ import { describe, it, expect, vi, beforeAll } from "vitest";
 import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { Router } from "../src/router.js";
+import { extractGreenfieldFeatures } from "../src/greenfieldFeatures.js";
 import {
     classifyWithEmbeddings,
     initEmbeddingClassifier,
@@ -191,13 +192,13 @@ describe.skipIf(!hasEmbeddings)("E2E: Embedding classifier", () => {
     beforeAll(async () => {
         await initEmbeddingClassifier(modelsDir);
         // Check if init actually loaded the sessions
-        const probe = await classifyWithEmbeddings("test", [], modelsDir);
+        const probe = await classifyWithEmbeddings(extractGreenfieldFeatures("test"), "test", modelsDir);
         initSuccess = probe.success;
     });
 
     it("classifies a simple task as small/medium (class 0 or 1)", async () => {
         if (!initSuccess) return; // ONNX runtime not available
-        const result = await classifyWithEmbeddings("rename variable x to count", [], modelsDir);
+        const result = await classifyWithEmbeddings(extractGreenfieldFeatures("rename variable x to count"), "rename variable x to count", modelsDir);
         expect(result.success).toBe(true);
         if (result.success) {
             expect([0, 1]).toContain(result.predictedClass);
@@ -208,11 +209,13 @@ describe.skipIf(!hasEmbeddings)("E2E: Embedding classifier", () => {
 
     it("classifies a complex task as large/cloud (class 2 or 3)", async () => {
         if (!initSuccess) return;
-        const result = await classifyWithEmbeddings(
+        const complexPrompt =
             "Redesign the entire microservices architecture to use event sourcing with CQRS. " +
             "Migrate all 12 services from REST to gRPC, implement saga patterns for distributed " +
-            "transactions, add OpenTelemetry tracing, and set up Kubernetes operators for auto-scaling.",
-            [],
+            "transactions, add OpenTelemetry tracing, and set up Kubernetes operators for auto-scaling.";
+        const result = await classifyWithEmbeddings(
+            extractGreenfieldFeatures(complexPrompt),
+            complexPrompt,
             modelsDir,
         );
         expect(result.success).toBe(true);
@@ -223,7 +226,7 @@ describe.skipIf(!hasEmbeddings)("E2E: Embedding classifier", () => {
 
     it("returns 4 class probabilities that sum to ~1", async () => {
         if (!initSuccess) return;
-        const result = await classifyWithEmbeddings("fix null pointer", [], modelsDir);
+        const result = await classifyWithEmbeddings(extractGreenfieldFeatures("fix null pointer"), "fix null pointer", modelsDir);
         expect(result.success).toBe(true);
         if (result.success) {
             expect(result.probabilities).toHaveLength(4);
@@ -235,13 +238,14 @@ describe.skipIf(!hasEmbeddings)("E2E: Embedding classifier", () => {
     it("caches embeddings for repeated prompts", async () => {
         clearEmbeddingCache();
         const prompt = "add error handling to the API endpoint";
+        const features = extractGreenfieldFeatures(prompt);
 
         const start1 = performance.now();
-        await classifyWithEmbeddings(prompt, [], modelsDir);
+        await classifyWithEmbeddings(features, prompt, modelsDir);
         const time1 = performance.now() - start1;
 
         const start2 = performance.now();
-        await classifyWithEmbeddings(prompt, [], modelsDir);
+        await classifyWithEmbeddings(features, prompt, modelsDir);
         const time2 = performance.now() - start2;
 
         // Second call should be faster (cached embedding)
