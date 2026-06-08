@@ -22,3 +22,12 @@ export { RoutingErrorCode, LocalRoutingErrorCode } from "./errors.js";
 export { setLogger, getLogger, silentLogger } from "./logger.js";
 export type { Logger } from "./logger.js";
 export { formatError } from "./helpers.js";
+
+// Cloud consultation (delegation pattern)
+export {
+    verifyWithCloud,
+    planWithCloud,
+    pickConsultationStrategy,
+    ConsultationStrategy,
+} from "./cloudConsultation.js";
+export type { ConsultationResult, CloudCompletionFn } from "./cloudConsultation.js";
