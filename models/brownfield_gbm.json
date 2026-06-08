@@ -1,0 +1,22 @@
+{
+  "modelPath": "./brownfield_gbm.onnx",
+  "featureOrder": [
+    "repo_n_py_files",
+    "repo_total_loc",
+    "repo_cc_mean",
+    "repo_cc_max",
+    "repo_cc_p90",
+    "iss_files_mentioned",
+    "iss_files_existing",
+    "iss_files_cc_mean",
+    "iss_files_cc_max",
+    "iss_files_loc_sum",
+    "iss_files_hl_vol_log",
+    "iss_files_hl_diff_mean"
+  ],
+  "threshold": null,
+  "metadata": {},
+  "n_features": 12,
+  "estimator_type": "GradientBoostingClassifier",
+  "onnx_size_bytes": 27686
+}

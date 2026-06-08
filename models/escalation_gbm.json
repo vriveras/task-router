@@ -1,0 +1,9 @@
+{
+  "modelPath": "./escalation_gbm.onnx",
+  "featureOrder": ["n_turns", "n_tool_calls", "n_grep", "n_read", "n_edit", "n_run"],
+  "threshold": null,
+  "metadata": {},
+  "n_features": 6,
+  "estimator_type": "GradientBoostingClassifier",
+  "onnx_size_bytes": 28197
+}

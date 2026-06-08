@@ -1,0 +1,13 @@
+{
+  "kb_has_assertion": ["assert", "expect", "must equal", "should equal"],
+  "kb_has_exception": ["raise", "throw", "exception", "error"],
+  "kb_has_loop": ["for each", "iterate", "loop", "while"],
+  "kb_has_recursion": ["recursive", "recursion"],
+  "kb_has_io": ["read file", "write file", "open(", "stdin", "stdout"],
+  "kb_has_concurrency": ["thread", "asyncio", "concurrent", "parallel", "lock"],
+  "kb_has_datetime": ["date", "time", "datetime", "timezone"],
+  "kb_has_regex": ["regex", "regular expression", "pattern"],
+  "kb_has_math": ["math", "compute", "sum", "product", "average", "mean"],
+  "kb_has_collection": ["list", "dict", "set", "tuple", "array", "map"],
+  "kb_has_string": ["string", "substring", "split", "join", "format"]
+}

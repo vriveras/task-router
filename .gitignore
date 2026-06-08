@@ -1,0 +1,5 @@
+node_modules/
+dist/
+*.tsbuildinfo
+# Large ONNX models tracked via Git LFS
+# models/embeddings/all-MiniLM-L6-v2.onnx

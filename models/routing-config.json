@@ -1,0 +1,13 @@
+{
+  "bundles": {
+    "greenfield": "greenfield_gbm.json",
+    "escalation": "escalation_gbm.json",
+    "brownfield": "brownfield_gbm.json",
+    "localRouterEmbed": "local_router_embed.json"
+  },
+  "embeddings": {
+    "model": "embeddings/all-MiniLM-L6-v2.onnx",
+    "tokenizer": "embeddings/tokenizer.json",
+    "classifier": "local_router_embed.onnx"
+  }
+}

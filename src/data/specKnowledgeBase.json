@@ -1,0 +1,12 @@
+{
+  "skb_modal_must": ["must", "shall", "required"],
+  "skb_modal_should": ["should", "recommended", "preferred"],
+  "skb_modal_may": ["may", "optional", "can"],
+  "skb_nfr_performance": ["fast", "performance", "latency", "throughput", "efficient"],
+  "skb_nfr_security": ["secure", "auth", "permission", "vulnerability", "owasp"],
+  "skb_nfr_reliability": ["robust", "reliable", "retry", "idempotent"],
+  "skb_scope_function": ["function", "method", "implement", "return"],
+  "skb_scope_module": ["module", "package", "class", "library"],
+  "skb_scope_minimal": ["minimal", "one file", "single file", "no tests", "prototype", "skeleton"],
+  "skb_example_marker": ["example", "for example", "e.g.", "sample"]
+}

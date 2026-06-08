@@ -1,0 +1,42 @@
+{
+  "name": "@vriveras/task-router",
+  "version": "0.1.0",
+  "description": "Standalone ONNX task complexity router for AI agent orchestration",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./models": "./models/"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch",
+    "example:basic": "tsx examples/basic-routing.ts",
+    "example:server": "tsx examples/express-server.ts",
+    "example:openai": "tsx examples/openai-compatible.ts"
+  },
+  "keywords": [
+    "routing",
+    "onnx",
+    "task-router",
+    "ai-agent",
+    "llm"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "onnxruntime-node": "^1.21.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0",
+    "tsx": "^4.19.0",
+    "@types/node": "^22.0.0",
+    "express": "^5.1.0",
+    "@types/express": "^5.0.0"
+  }
+}
