@@ -47,9 +47,9 @@ Prompt arrives
     ▼
 ┌─────────────────────────────────────────────────────┐
 │ Layer 1: EMBEDDING CLASSIFIER (84% accuracy)        │
-│   MiniLM-L6-v2 → 384-dim embedding                 │
+│   MiniLM-L6-v2 → 384-dim embedding                  │
 │   + 34 text features = 418-dim feature vector       │
-│   → GBM (ONNX) → 4 probabilities:                  │
+│   → GBM (ONNX) → 4 probabilities:                   │
 │     [P(small), P(medium), P(large), P(cloud)]       │
 │   Winner = argmax → routing tier                    │
 └────────────────────────┬────────────────────────────┘
@@ -57,7 +57,7 @@ Prompt arrives
                          ▼
 ┌─────────────────────────────────────────────────────┐
 │ Layer 2: GREENFIELD GBM (65% accuracy)              │
-│   34 text-only features → ONNX GBM → P(large)      │
+│   34 text-only features → ONNX GBM → P(large)       │
 └────────────────────────┬────────────────────────────┘
                          │ if unavailable
                          ▼
